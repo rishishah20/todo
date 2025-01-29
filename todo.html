@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo App</title>
+</head>
+<style>
+    body { 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0; 
+        
+
+    }
+</style>
+<body>
+    <div id="date-time"></div>
+    <h1>Todo Application</h1>
+    <form id="todo-form">
+        <input type="text" id="todo-input" placeholder="Add a new todo" required>
+        <button type="submit">Add Todo</button>
+    </form>
+    <ul id="todo-list"></ul>
+    <div id="error-message" style="color: red;"></div>
+    <script>
+        const todoForm = document.getElementById('todo-form');
+const todoInput = document.getElementById('todo-input');
+const todoList = document.getElementById('todo-list');
+const errorMessage = document.getElementById('error-message');
+const dateTimeDisplay = document.getElementById('date-time');
+
+let todos = localStorage.getItem('todos') ? localStorage.getItem('todos').split(',') : [];
+
+function displayTodos() {
+    todoList.innerHTML = '';
+    todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        li.textContent = todo;
+
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => {
+            const newTodoText = prompt('Edit your todo:', todo);
+            if (newTodoText !== null && newTodoText.trim() !== '') {
+                todos[index] = newTodoText.trim();
+                saveTodos();
+                displayTodos();
+            }
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            todos.splice(index, 1);
+            saveTodos();
+            displayTodos();
+        });
+
+        li.appendChild(editButton);
+        li.appendChild(deleteButton);
+        todoList.appendChild(li);
+    });
+}
+
+function saveTodos() {
+    localStorage.setItem('todos', todos.join(','));
+}
+
+function addTodo() {
+    const todoText = todoInput.value.trim();
+    if (todoText === '') {
+        errorMessage.textContent = 'Todo cannot be empty!';
+        return;
+    }
+    errorMessage.textContent = '';
+    todos.push(todoText);
+    saveTodos();
+    displayTodos();
+    todoInput.value = '';
+}
+
+function updateDateTime() {
+    const now = new Date();
+    dateTimeDisplay.textContent = now.toLocaleString(); 
+}
+
+todoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    addTodo();
+});
+
+displayTodos();
+updateDateTime();
+setInterval(updateDateTime, 1000);
+</script>
+</body>
+</html>
